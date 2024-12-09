@@ -1,0 +1,6 @@
+package: gen
+output: internal/gateway/gen/rest.gen.go
+generate:
+  embedded-spec: true
+  strict-server: true
+  gin-server: true

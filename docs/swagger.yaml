@@ -1,0 +1,365 @@
+openapi: 3.0.0
+info:
+  title: Alice-skill-todo
+  version: 0.1.0
+paths:
+  /api/todo-lists:
+    post:
+      operationId: request_alice
+      summary: Запрос от Алисы
+      description: Содержит конкретное действие или запрос
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/alice.Request'
+      responses:
+        200:
+          description: 'User todo lists'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/alice.Response'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /health:
+    get:
+      summary: Проверка состояния сервиса
+      description: Возвращает состояние здоровья сервиса.
+      responses:
+        '200':
+          description: Сервис работает
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+        '500':
+          description: Ошибка сервиса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error
+      required:
+        - error
+
+    HealthCheckResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    alice.Entity:
+      properties:
+        tokens:
+          $ref: '#/components/schemas/alice.EntityTokens'
+        type:
+          $ref: '#/components/schemas/alice.EntityType'
+        value: { }
+      type: object
+      required:
+        - tokens
+        - type
+        - value
+
+    alice.EntityTokens:
+      properties:
+        end:
+          type: integer
+        start:
+          type: integer
+      type: object
+      required:
+        - start
+        - end
+
+    alice.EntityType:
+      enum:
+        - YANDEX.FIO
+        - YANDEX.GEO
+        - YANDEX.DATETIME
+        - YANDEX.NUMBER
+      type: string
+      x-enum-varnames:
+        - EntityYandexFio
+        - EntityYandexGeo
+        - EntityYandexDateTime
+        - EntityYandexNumber
+
+    alice.Request:
+      properties:
+        meta:
+          $ref: '#/components/schemas/alice.RequestMeta'
+        request:
+          $ref: '#/components/schemas/alice.RequestPayload'
+        session:
+          $ref: '#/components/schemas/alice.RequestSession'
+        version:
+          type: string
+      type: object
+      required:
+        - version
+        - meta
+        - request
+        - session
+
+    alice.RequestMarkup:
+      properties:
+        dangerous_context:
+          type: boolean
+      type: object
+      required:
+        - dangerous_context
+
+    alice.RequestMeta:
+      properties:
+        client_id:
+          type: string
+        interfaces:
+          additionalProperties: true
+          type: object
+        locale:
+          type: string
+        timezone:
+          type: string
+      type: object
+      required:
+        - client_id
+        - interfaces
+        - locale
+        - timezone
+
+    alice.RequestNLU:
+      properties:
+        entities:
+          items:
+            $ref: '#/components/schemas/alice.Entity'
+          type: array
+        tokens:
+          items:
+            type: string
+          type: array
+      type: object
+      required:
+        - entities
+        - tokens
+
+    alice.RequestPayload:
+      properties:
+        command:
+          type: string
+        markup:
+          $ref: '#/components/schemas/alice.RequestMarkup'
+        nlu:
+          $ref: '#/components/schemas/alice.RequestNLU'
+        original_utterance:
+          type: string
+        payload: { }
+        type:
+          $ref: '#/components/schemas/alice.RequestPayloadType'
+      type: object
+      required:
+        - payload
+        - type
+        - command
+        - markup
+        - nlu
+        - original_utterance
+
+    alice.RequestPayloadType:
+      enum:
+        - SimpleUtterance
+        - ButtonPressed
+      type: string
+      x-enum-varnames:
+        - SimpleUtterance
+        - ButtonPressed
+
+    alice.RequestSession:
+      properties:
+        message_id:
+          type: integer
+        new:
+          type: boolean
+        session_id:
+          type: string
+        skill_id:
+          type: string
+        user_id:
+          type: string
+      type: object
+      required:
+        - new
+        - message_id
+        - session_id
+        - skill_id
+        - user_id
+
+    alice.Response:
+      properties:
+        response:
+          $ref: '#/components/schemas/alice.ResponsePayload'
+        session:
+          $ref: '#/components/schemas/alice.ResponseSession'
+        version:
+          type: string
+      type: object
+      required:
+        - response
+        - session
+        - version
+
+    alice.ResponseButton:
+      properties:
+        hide:
+          type: boolean
+        payload: { }
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+      required:
+        - hide
+        - payload
+        - title
+        - url
+
+    alice.ResponseCard:
+      properties:
+        button:
+          $ref: '#/components/schemas/alice.ResponseCardButton'
+        description:
+          type: string
+        footer:
+          $ref: '#/components/schemas/alice.ResponseCardFooter'
+        header:
+          $ref: '#/components/schemas/alice.ResponseCardHeader'
+        image_id:
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/alice.ResponseCardItem'
+          type: array
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/alice.ResponseCardType'
+      type: object
+      required:
+        - type
+
+    alice.ResponseCardButton:
+      properties:
+        payload: { }
+        text:
+          type: string
+        url:
+          type: string
+      type: object
+      required:
+        - payload
+        - text
+        - url
+
+    alice.ResponseCardFooter:
+      properties:
+        button:
+          $ref: '#/components/schemas/alice.ResponseCardButton'
+        text:
+          type: string
+      type: object
+      required:
+        - text
+
+    alice.ResponseCardHeader:
+      properties:
+        text:
+          type: string
+      type: object
+      required:
+        - text
+
+    alice.ResponseCardItem:
+      properties:
+        button:
+          $ref: '#/components/schemas/alice.ResponseCardButton'
+        description:
+          type: string
+        image_id:
+          type: string
+        title:
+          type: string
+      type: object
+      required:
+        - description
+        - image_id
+        - title
+
+    alice.ResponseCardType:
+      enum:
+        - BigImage
+        - ImageGallery
+        - ItemsList
+      type: string
+      x-enum-varnames:
+        - BigImage
+        - ImageGallery
+        - ItemsList
+
+    alice.ResponsePayload:
+      properties:
+        buttons:
+          items:
+            $ref: '#/components/schemas/alice.ResponseButton'
+          type: array
+        card:
+          $ref: '#/components/schemas/alice.ResponseCard'
+        end_session:
+          type: boolean
+        text:
+          type: string
+        tts:
+          type: string
+      type: object
+      required:
+        - buttons
+        - text
+        - tts
+        - end_session
+
+    alice.ResponseSession:
+      properties:
+        message_id:
+          type: integer
+        session_id:
+          type: string
+        user_id:
+          type: string
+      type: object
+      required:
+        - message_id
+        - session_id
+        - user_id
