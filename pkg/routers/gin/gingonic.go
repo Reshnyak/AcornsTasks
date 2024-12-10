@@ -29,6 +29,6 @@ func InitRouter(cfg *configs.Config) *gin.Engine {
 
 	router.POST("/input", handlers.AlicePost())
 	// Подключение Swagger yaml
-	router.StaticFile("/docs", "../docs/swagger.yaml")
+	router.StaticFile("/docs", "./docs/swagger.yaml")
 	return router
 }
